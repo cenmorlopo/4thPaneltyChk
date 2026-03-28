@@ -1,0 +1,13 @@
+{
+  "name": "beu-penalty-checker",
+  "version": "1.0.0",
+  "description": "BEU 4th sem penalty checker",
+  "main": "penalty_checker.js",
+  "scripts": {
+    "start": "node penalty_checker.js"
+  },
+  "dependencies": {
+    "axios": "^1.8.4",
+    "cheerio": "^1.0.0"
+  }
+}
