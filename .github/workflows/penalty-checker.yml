@@ -1,0 +1,78 @@
+name: BEU Penalty Checker
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */6 * * *"
+
+concurrency:
+  group: beu-penalty-checker
+  cancel-in-progress: false
+
+jobs:
+  penalty-check:
+    runs-on: windows-2025
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Ensure base files exist
+        shell: pwsh
+        run: |
+          if (!(Test-Path "penalty_state.json")) { '{"lineIndex":0}' | Out-File -Encoding utf8 penalty_state.json }
+          if (!(Test-Path "penalty_seen.txt")) { New-Item -ItemType File penalty_seen.txt | Out-Null }
+          if (!(Test-Path "penalty_failed.txt")) { "reg_no | reason | detail | old_result_url | new_result_url" | Out-File -Encoding utf8 penalty_failed.txt }
+          if (!(Test-Path "penalty_absent.txt")) { "reg_no | branch_code | subject_codes | subject_names | reason | old_result_url | new_result_url" | Out-File -Encoding utf8 penalty_absent.txt }
+          if (!(Test-Path "penalty_manual_review.txt")) { "reg_no | branch_code | subject_codes | subject_names | reason | old_result_url | new_result_url" | Out-File -Encoding utf8 penalty_manual_review.txt }
+          if (!(Test-Path "penalty_audit.txt")) { "reg_no | sem | branch_code | subject_code | subject_name | subject_type | credit | old_shown_grade | new_shown_grade | should_be_grade | shown_gp | corrected_gp | delta_points | new_ese | new_ia | new_total | old_result_url | new_result_url" | Out-File -Encoding utf8 penalty_audit.txt }
+          if (!(Test-Path "penalty_calc_output.txt")) { "reg_no | branch_code | penalized_subject_codes | subject_names | old_shown_grades | new_shown_grades | should_be_grades | shown_sgpa | corrected_sgpa | shown_cgpa | corrected_cgpa | status | old_result_url | new_result_url" | Out-File -Encoding utf8 penalty_calc_output.txt }
+          if (!(Test-Path "penalty_log.txt")) { New-Item -ItemType File penalty_log.txt | Out-Null }
+
+      - name: Run penalty checker
+        id: penalty
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          node penalty_checker.js
+
+      - name: Commit and push progress
+        if: always()
+        shell: pwsh
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add penalty_calc_output.txt penalty_audit.txt penalty_absent.txt penalty_manual_review.txt penalty_failed.txt penalty_log.txt penalty_state.json penalty_seen.txt
+
+          git diff --cached --quiet
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "No changes to commit."
+            exit 0
+          }
+
+          git commit -m "Auto-update: penalty checker progress"
+          git pull --rebase origin main
+          git push origin main
+
+      - name: Show checker status
+        if: always()
+        shell: pwsh
+        run: |
+          if ("${{ steps.penalty.outcome }}" -eq "failure") {
+            Write-Host "Penalty checker failed, but progress was committed."
+          } else {
+            Write-Host "Penalty checker completed successfully."
+          }
