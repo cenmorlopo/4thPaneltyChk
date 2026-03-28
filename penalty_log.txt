@@ -3122,3 +3122,6 @@
 [2026-03-28T08:33:24.657Z] [3120/3121] 22157147047 | penalty=2 | absent=0 | manual=0 -> https://beu-bih.ac.in/result-three?name=B.Tech.+4th+Semester+Examination%2C+2025&semester=IV&session=2022-26&regNo=22157147047&exam_held=December%2F2025
 [2026-03-28T08:33:25.909Z] [3121/3121] 22157147058 | penalty=0 | absent=0 | manual=0 -> https://beu-bih.ac.in/result-three?name=B.Tech.+4th+Semester+Examination%2C+2025&semester=IV&session=2022-26&regNo=22157147058&exam_held=December%2F2025
 [2026-03-28T08:33:26.810Z] COMPLETE all students finished
+[2026-03-28T14:02:57.904Z] Loaded 3121 grouped students from result_students.txt
+[2026-03-28T14:02:57.907Z] Resuming from lineIndex=3121
+[2026-03-28T14:02:57.907Z] COMPLETE all students finished
