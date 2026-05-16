@@ -3680,3 +3680,6 @@
 [2026-05-16T03:42:35.056Z] Loaded 3121 grouped students from result_students.txt
 [2026-05-16T03:42:35.059Z] Resuming from lineIndex=3121
 [2026-05-16T03:42:35.059Z] COMPLETE all students finished
+[2026-05-16T08:11:59.726Z] Loaded 3121 grouped students from result_students.txt
+[2026-05-16T08:11:59.728Z] Resuming from lineIndex=3121
+[2026-05-16T08:11:59.729Z] COMPLETE all students finished
